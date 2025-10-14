@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Debug Test</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Authentication Debug Test</h1>
+    
+    <h2>Test Backend Directly</h2>
+    <div>
+        <h3>1. Test Signup</h3>
+        <button onclick="testSignup()">Test Signup</button>
+        <div id="signup-result"></div>
+    </div>
+    
+    <div>
+        <h3>2. Test Login</h3>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="login-result"></div>
+    </div>
+    
+    <div>
+        <h3>3. Check LocalStorage</h3>
+        <button onclick="checkLocalStorage()">Check LocalStorage</button>
+        <div id="storage-result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/auth/';
+        
+        const testUser = {
+            name: 'Debug Test User',
+            email: 'debugtest@example.com',
+            password: 'password123',
+            userType: 'FARMER'
+        };
+
+        async function testSignup() {
+            const resultDiv = document.getElementById('signup-result');
+            try {
+                console.log('Testing signup with:', testUser);
+                const response = await axios.post(API_URL + 'signup', testUser);
+                console.log('Signup response:', response.data);
+                resultDiv.innerHTML = `<pre style="color: green;">SUCCESS: ${JSON.stringify(response.data, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Signup error:', error);
+                resultDiv.innerHTML = `<pre style="color: red;">ERROR: ${error.response?.data?.message || error.message}</pre>`;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            try {
+                console.log('Testing login with:', { email: testUser.email, password: '***' });
+                const response = await axios.post(API_URL + 'signin', {
+                    email: testUser.email,
+                    password: testUser.password
+                });
+                console.log('Login response:', response.data);
+                
+                // Store in localStorage like the app does
+                if (response.data.token) {
+                    localStorage.setItem('token', response.data.token);
+                    const userObj = {
+                        id: response.data.id,
+                        name: response.data.name,
+                        email: response.data.email,
+                        userType: response.data.userType,
+                    };
+                    localStorage.setItem('user', JSON.stringify(userObj));
+                }
+                
+                resultDiv.innerHTML = `<pre style="color: green;">SUCCESS: ${JSON.stringify(response.data, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Login error:', error);
+                resultDiv.innerHTML = `<pre style="color: red;">ERROR: ${error.response?.data?.message || error.message}</pre>`;
+            }
+        }
+
+        function checkLocalStorage() {
+            const resultDiv = document.getElementById('storage-result');
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            resultDiv.innerHTML = `
+                <pre style="color: blue;">
+Token: ${token || 'null'}
+User: ${user || 'null'}
+                </pre>
+            `;
+            
+            console.log('LocalStorage check:');
+            console.log('Token:', token);
+            console.log('User:', user);
+        }
+    </script>
+</body>
+</html>
