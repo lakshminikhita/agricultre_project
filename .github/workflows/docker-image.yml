@@ -29,7 +29,7 @@ jobs:
           context: ./backend
           file: ./backend/backend.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USER }}/cicd-review-backend:latest
+          tags: ${{ secrets.DOCKER_USER }}cicd-review-backend:latest
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
@@ -37,4 +37,4 @@ jobs:
           context: ./frontend
           file: ./frontend/frontend.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USER }}/cicd-review-frontend:latest
+          tags: ${{ secrets.DOCKER_USER }}cicd-review-frontend:latest
